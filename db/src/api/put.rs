@@ -29,21 +29,3 @@ pub fn fhir_put(mut entity: JsonB) -> Uuid {
 
     id
 }
-
-/// Updates an existing FHIR resource in the database.
-#[pg_extern(name = "fhir_put")]
-#[trace]
-pub fn fhir_put_update(id: Uuid, mut entity: JsonB) {
-    let entity_obj = entity.0.as_object_mut().expect("Entity must be an object");
-
-    entity_obj.remove("id");
-    entity_obj.remove("resourceType");
-
-    Spi::run_with_args(
-        r#"
-        UPDATE "fhir"."entity" SET "data" = $2 WHERE "id" = $1;
-        "#,
-        &[id.into(), entity.into()],
-    )
-    .expect("Failed to insert entity");
-}
