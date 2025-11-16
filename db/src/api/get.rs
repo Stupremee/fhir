@@ -2,11 +2,13 @@ use fastrace::trace;
 use pgrx::{prelude::*, JsonB, Uuid};
 use serde_json::Value;
 
+use crate::spi;
+
 /// Gets a FHIR resource for a certain id.
 #[pg_extern]
 #[trace]
 pub fn fhir_get(entity: String, id: Uuid) -> Option<JsonB> {
-    let mut data = Spi::get_one_with_args::<JsonB>(
+    let mut data = spi::get_one_with_args::<JsonB>(
         r#"
         SELECT "data" FROM "fhir"."entity" WHERE "id" = $1 AND "resource_type" = $2;
         "#,

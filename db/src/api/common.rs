@@ -1,3 +1,4 @@
+use fastrace::trace;
 use pgrx::{prelude::*, JsonB};
 use serde_json::Value;
 
@@ -5,6 +6,7 @@ use crate::fhir;
 
 /// Checks if the `data` matches the given JSON schema.
 #[pg_extern]
+#[trace]
 pub fn fhir_is_valid(entity: &str, mut data: JsonB) -> bool {
     let Some(data_obj) = data.0.as_object_mut() else {
         return false;
@@ -28,6 +30,7 @@ pub fn fhir_is_valid(entity: &str, mut data: JsonB) -> bool {
 ///
 /// These ids are used for all FHIR resources as their identifier.
 #[pg_extern]
+#[trace]
 pub fn fhir_generate_id() -> pgrx::Uuid {
     pgrx::Uuid::from_bytes(uuid::Uuid::now_v7().into_bytes())
 }

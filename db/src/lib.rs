@@ -8,7 +8,11 @@ mod api;
 mod fhir;
 mod gucs;
 mod hooks;
+mod index;
+mod macros;
+mod models;
 mod schema;
+mod spi;
 
 ::pgrx::pg_module_magic!(name, version);
 

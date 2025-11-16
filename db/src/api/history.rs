@@ -1,6 +1,8 @@
 use json_diff_ng::{compare_serde_values, PathElement};
-use pgrx::{prelude::*, JsonB, Uuid};
+use pgrx::{prelude::*, spi::SpiError, JsonB, Uuid};
 use thiserror::Error;
+
+use crate::spi;
 
 #[derive(Error, Debug)]
 pub enum TriggerError {
@@ -17,7 +19,7 @@ pub enum TriggerError {
     PgTrigger(#[from] PgTriggerError),
 
     #[error("{0}")]
-    Spi(#[from] spi::SpiError),
+    Spi(#[from] SpiError),
 
     #[error("{0}")]
     TryFromDatum(#[from] pgrx::datum::TryFromDatumError),
@@ -45,7 +47,7 @@ pub fn fhir_log_entity_history<'t>(
             let entity_id = new.get_by_name::<Uuid>("id")?;
             let data = new.get_by_name::<JsonB>("data")?;
 
-            Spi::run_with_args(
+            spi::run_with_args(
                 r#"
                 INSERT INTO "fhir"."entity_history"
                     ("entity_id", "timestamp", "operation", "data")
@@ -93,7 +95,7 @@ pub fn fhir_log_entity_history<'t>(
                 removed_values.insert(path_to_string(&v.path), value);
             }
 
-            Spi::run_with_args(
+            spi::run_with_args(
                 r#"
                 INSERT INTO "fhir"."entity_history"
                     (
@@ -123,7 +125,7 @@ pub fn fhir_log_entity_history<'t>(
             let entity_id = old.get_by_name::<Uuid>("id")?;
             let data = old.get_by_name::<JsonB>("data")?;
 
-            Spi::run_with_args(
+            spi::run_with_args(
                 r#"
                 INSERT INTO "fhir"."entity_history"
                     ("entity_id", "timestamp", "operation", "data")
