@@ -1,0 +1,34 @@
+[package]
+name = "fhir"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[[bin]]
+name = "pgrx_embed_fhir"
+path = "./src/bin/pgrx_embed.rs"
+
+[features]
+default = ["pg13"]
+pg13 = ["pgrx/pg13", "pgrx-tests/pg13" ]
+pg14 = ["pgrx/pg14", "pgrx-tests/pg14" ]
+pg15 = ["pgrx/pg15", "pgrx-tests/pg15" ]
+pg16 = ["pgrx/pg16", "pgrx-tests/pg16" ]
+pg17 = ["pgrx/pg17", "pgrx-tests/pg17" ]
+pg18 = ["pgrx/pg18", "pgrx-tests/pg18" ]
+pg_test = []
+
+[dependencies]
+fastrace = { version = "0.7.14", features = ["enable"] }
+fastrace-jaeger = "0.7.14"
+json_diff_ng = { version = "0.6.0", default-features = false }
+jsonschema = { version = "0.34.0", default-features = false }
+pgrx = "=0.16.1"
+serde_json = "1.0.145"
+thiserror = "2.0.17"
+uuid = { version = "1.18.1", features = ["v7"] }
+
+[dev-dependencies]
+pgrx-tests = "=0.16.1"
