@@ -13,11 +13,19 @@ use crate::spi;
 
 mod patient;
 
+/// The type of an indexed key.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IndexedKeyType {
+    Text,
+    Date,
+}
+
 /// Collection of values that must be inserted into the index tables.
 ///
 /// This is separated into a struct, to allow for first collecting the values,
 /// but then inserting them at a later point.
 pub struct IndexableValues {
+    entity: String,
     text: Option<HashMap<&'static str, Vec<String>>>,
     date: Option<HashMap<&'static str, Vec<Date>>>,
 }
@@ -25,6 +33,7 @@ pub struct IndexableValues {
 impl IndexableValues {
     fn insert_values<'d, T: Into<DatumWithOid<'d>>>(
         suffix: &str,
+        entity: &str,
         id: Uuid,
         vals: HashMap<&'static str, Vec<T>>,
     ) -> spi::Result<()> {
@@ -33,11 +42,11 @@ impl IndexableValues {
                 spi::run_with_args(
                     &format!(
                         r#"
-                    INSERT INTO "fhir"."entity_index_{suffix}" ("entity_id", "key", "value")
-                    VALUES ($1, $2, $3);
+                    INSERT INTO "fhir"."entity_index_{suffix}" ("entity_id", "entity", "key", "value")
+                    VALUES ($1, $2, $3, $4);
                     "#
                     ),
-                    &[id.into(), key.into(), value.into()],
+                    &[id.into(), entity.into(), key.into(), value.into()],
                 )?;
             }
         }
@@ -49,11 +58,11 @@ impl IndexableValues {
     #[trace]
     pub fn insert(self, id: Uuid) -> spi::Result<()> {
         if let Some(text_values) = self.text.filter(|v| !v.is_empty()) {
-            Self::insert_values("text", id, text_values)?;
+            Self::insert_values("text", &self.entity, id, text_values)?;
         }
 
         if let Some(date_values) = self.date.filter(|v| !v.is_empty()) {
-            Self::insert_values("date", id, date_values)?;
+            Self::insert_values("date", &self.entity, id, date_values)?;
         }
 
         Ok(())
@@ -96,5 +105,21 @@ pub fn collect_index_values_for(entity: &str, data: &Value) -> IndexableValues {
     let text = text_index_values_for(entity, data);
     let date = date_index_values_for(entity, data);
 
-    IndexableValues { text, date }
+    IndexableValues {
+        text,
+        date,
+        entity: entity.to_string(),
+    }
+}
+
+/// Determines which index table stores the specified search parameter for a given entity type.
+///
+/// Returns the data type of the indexed search parameter,
+/// which indicates which table must be queried, and what the type of the value must be.
+#[trace]
+pub fn find_search_index_for_key(entity: &str, key: &str) -> Option<IndexedKeyType> {
+    match entity {
+        "Patient" => patient::find_search_index_for_key(key),
+        _ => None,
+    }
 }

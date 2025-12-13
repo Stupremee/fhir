@@ -5,7 +5,15 @@ use std::{collections::HashMap, str::FromStr as _};
 use pgrx::{datum::Date, warning};
 use serde_json::Value;
 
-use crate::models::Patient;
+use crate::{index::IndexedKeyType, models::Patient};
+
+pub fn find_search_index_for_key(key: &str) -> Option<IndexedKeyType> {
+    Some(match key {
+        "birth_date" => IndexedKeyType::Date,
+        "gender" | "name" => IndexedKeyType::Text,
+        _ => return None,
+    })
+}
 
 pub fn date_index_values_for(data: &Value) -> HashMap<&'static str, Vec<Date>> {
     let mut keys = HashMap::new();

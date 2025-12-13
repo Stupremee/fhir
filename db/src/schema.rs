@@ -60,18 +60,21 @@ EXECUTE FUNCTION "public"."fhir_log_entity_history"();
 // `value` is the value that can be used for searching.
 extension_sql!(
     r#"
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 CREATE TABLE "fhir"."entity_index_text" (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     entity_id UUID NOT NULL REFERENCES "fhir"."entity" ("id") ON DELETE CASCADE,
+    entity TEXT NOT NULL,
     key TEXT NOT NULL,
     value TEXT NOT NULL
 );
 
 -- This index is mainly used for deleting and updating entities, so we can quickly find all values for a single entity.
 CREATE INDEX "entity_index_text_entity_id_idx" ON "fhir"."entity_index_text" ("entity_id");
-
--- This is the main index used for searching
-CREATE INDEX "entity_index_text_key_value_idx" ON "fhir"."entity_index_text" ("key", "value");
+CREATE INDEX "entity_index_text_key_value_idx" ON "fhir"."entity_index_text" ("entity", "key", "value");
+CREATE INDEX "entity_index_text_key_idx" ON "fhir"."entity_index_text" ("entity", "key");
+CREATE INDEX "entity_index_text_value_gin_idx" ON "fhir"."entity_index_text" USING GIN ("value" gin_trgm_ops);
     "#,
     name = "entity_index_text",
     requires = ["entity_table"]
@@ -82,12 +85,14 @@ extension_sql!(
 CREATE TABLE "fhir"."entity_index_date" (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     entity_id UUID NOT NULL REFERENCES "fhir"."entity" ("id") ON DELETE CASCADE,
+    entity TEXT NOT NULL,
     key TEXT NOT NULL,
     value DATE NOT NULL
 );
 
 CREATE INDEX "entity_index_date_entity_id_idx" ON "fhir"."entity_index_date" ("entity_id");
-CREATE INDEX "entity_index_date_key_value_idx" ON "fhir"."entity_index_date" ("key", "value");
+CREATE INDEX "entity_index_date_key_value_idx" ON "fhir"."entity_index_date" ("entity", "key", "value");
+CREATE INDEX "entity_index_date_key_idx" ON "fhir"."entity_index_date" ("entity", "key");
     "#,
     name = "entity_index_date",
     requires = ["entity_table"]

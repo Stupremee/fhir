@@ -129,4 +129,17 @@ mod tests {
 
         assert!(data.0.as_object().unwrap().get("id").is_none());
     }
+
+    #[pg_test]
+    fn fhir_search() {
+        let data = patient();
+        let id = Spi::get_one_with_args::<Uuid>("SELECT fhir_put($1)", &[data.into()]).unwrap();
+
+        let _data = Spi::get_one_with_args::<Uuid>(
+            "SELECT fhir_search('Patient', 'gender', '=', 'female')",
+            &[id.into()],
+        )
+        .unwrap()
+        .unwrap();
+    }
 }
