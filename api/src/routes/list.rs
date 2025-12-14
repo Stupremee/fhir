@@ -84,6 +84,8 @@ pub async fn fhir_list(
         }
     };
 
+    // pagination is stable, because we order by `id` and the id
+    // is an uuid v7, which is prefixed by timestmap.
     let entities = query!(
         r#"
     SELECT
