@@ -1,5 +1,18 @@
 # FHIR
 
+Documentation of the API endpoints is available via Scalar UI at `<server>/docs`
+path. There is one instance deployed at `https://rome.neon-opah.ts.net/docs`,
+which you can use for testing, and exploring the api.
+
+The server theoretically supports any FHIR resource, but only the `Patient`
+resource is indexed, so it can be searched.
+
+`Patient` supports the following search parameters:
+
+- `birth_date`
+- `name`
+- `gender`
+
 ## Tracing
 
 The extension contains basic tracing support that can be used to measure and
