@@ -15,6 +15,16 @@ fhir.jaeger_host = '127.0.0.1:6831'
 
 Then reload the extension and start tracing!
 
+## FHIR standard
+
+The HTTP part is only loosely following the official FHIR specification, because
+the standard is very complex in my opinion, and not worth it in a simple project
+like this.
+
+Most notably responses from the endpoints, like the search route, will not
+return the FHIR standard responses. Instead they return a simple to use json
+structure.
+
 ## Notes
 
 - First insert is relatively slow, because the JSON schema must be compiled
@@ -23,3 +33,7 @@ Then reload the extension and start tracing!
   - after that `fhir_put` takes around 3-4ms
   - could be improved by compiling the schema when starting
 - fastrace global exporter thread is not stopped when extension is dropped
+- The search endpoint only supports one single search paramater right now
+- Only eq, ne, gt, ge, lt and le FHIR operators are supported
+- Implement custom postgres error codes, so the API can handle certain errors
+  (like unknown search key) properly

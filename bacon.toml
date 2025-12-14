@@ -1,0 +1,23 @@
+default_job = "run-api"
+env.CARGO_TERM_COLOR = "always"
+
+[jobs.run-api]
+command = [
+    "cargo", "run", "-p", "api"
+]
+need_stdout = true
+allow_warnings = true
+background = false
+on_change_strategy = "kill_then_restart"
+workdir = "api"
+# kill = ["pkill", "-TERM", "-P"]
+
+[jobs.run-db]
+command = [
+    "cargo", "pgrx", "run", "-p", "fhir-db"
+]
+need_stdout = true
+allow_warnings = true
+background = false
+on_change_strategy = "kill_then_restart"
+# kill = ["pkill", "-TERM", "-P"]

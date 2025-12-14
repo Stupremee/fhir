@@ -128,6 +128,12 @@ pub fn fhir_search(
     let (table_suffix, value): (&str, DatumWithOid<'_>) = match (index_type, value) {
         (IndexedKeyType::Text, SearchValue::Text(v)) => ("text", v.into()),
         (IndexedKeyType::Date, SearchValue::Date(v)) => ("date", v.into()),
+        (IndexedKeyType::Date, SearchValue::Text(v)) => (
+            "date",
+            Date::from_str(&v)
+                .expect("could not parse text to date")
+                .into(),
+        ),
         _ => return Err(SearchError::InvalidValueType),
     };
 

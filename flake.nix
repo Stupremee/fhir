@@ -26,7 +26,12 @@
             rust-bin.stable.latest.default
             rustPlatform.bindgenHook
             cargo-pgrx
+            bacon
             cargo-shear
+            sqlx-cli
+
+            postgresql_18
+            postgresql_18.pg_config
 
             # build dependencies
             bison
@@ -41,6 +46,7 @@
           ];
 
           PG_VERSION = "pg18";
+          DATABASE_URL = "postgresql://localhost:28818/fhir";
         };
       }
     );
