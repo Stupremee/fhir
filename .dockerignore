@@ -1,0 +1,43 @@
+# Build artifacts
+target/
+**/*.rs.bk
+**/*.pdb
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment files (should be provided at runtime)
+.env
+.env.*
+!.env.example
+api/.env
+
+# Documentation
+README.md
+*.md
+
+# Git
+.git/
+.gitignore
+
+# Development tools
+bacon.toml
+flake.nix
+flake.lock
+.direnv/
+
+# Docker
+docker-compose.yaml
+Dockerfile
+.dockerignore
+
+# Test files
+**/tests/

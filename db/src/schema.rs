@@ -60,8 +60,6 @@ EXECUTE FUNCTION "public"."fhir_log_entity_history"();
 // `value` is the value that can be used for searching.
 extension_sql!(
     r#"
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
-
 CREATE TABLE "fhir"."entity_index_text" (
     id BIGINT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
     entity_id UUID NOT NULL REFERENCES "fhir"."entity" ("id") ON DELETE CASCADE,

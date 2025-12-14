@@ -1,0 +1,27 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n    SELECT\n        fhir_get($1, id) as entity\n    FROM\n        fhir_search($1, $2, $3, $4)\n    ORDER BY id\n    LIMIT $5\n    OFFSET $6\n    ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "entity",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Text",
+        "Text",
+        "Text",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "b6dff91090e0c6d7d38f963c561ecd9b16a69b319cf3c811a6a2f961f8cc6239"
+}
